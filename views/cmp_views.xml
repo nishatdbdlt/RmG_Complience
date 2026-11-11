@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Audit -->
+    <record id="view_cmp_audit_list" model="ir.ui.view">
+        <field name="name">rmg.cmp.audit.list</field>
+        <field name="model">rmg.cmp.audit</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'done'">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="template_id"/>
+                <field name="result" optional="show"/>
+                <field name="user_id" optional="show"/>
+                <field name="score" optional="show"/>
+                <field name="nc_count" optional="show"/>
+                <field name="state" widget="badge" decoration-success="state == 'done'" decoration-warning="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_cmp_audit_form" model="ir.ui.view">
+        <field name="name">rmg.cmp.audit.form</field>
+        <field name="model">rmg.cmp.audit</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_all_yes" string="All Compliant" type="object" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_done" string="Done" type="object" class="btn-success" invisible="state != 'draft'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="template_id" options="{'no_create': True, 'no_open': True}" readonly="state == 'done'"/>
+                            <field name="standard"/>
+                            <field name="result_type" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="date" readonly="state == 'done'"/>
+                            <field name="user_id" readonly="state == 'done'"/>
+                            <field name="score" invisible="state != 'done'"/>
+                            <field name="result" string="Result" readonly="1" force_save="1"/>
+                        </group>
+                    </group>
+                    <field name="line_ids" nolabel="1" readonly="state == 'done'">
+                        <list editable="bottom" create="0" delete="0"
+                              decoration-success="result == 'yes'" decoration-danger="result == 'no'" decoration-muted="result == 'na'">
+                            <field name="state" column_invisible="1"/>
+                            <field name="template_item_id" column_invisible="1"/>
+                            <field name="section" readonly="1" optional="show"/>
+                            <field name="name" readonly="1" force_save="1"/>
+                            <field name="critical" readonly="1" optional="show"/>
+                            <field name="result" readonly="1" widget="badge"/>
+                            <field name="remark" placeholder="Note (optional)"/>
+                            <button name="action_yes" type="object" icon="fa-check" class="text-success" title="Compliant" invisible="state == 'done'"/>
+                            <button name="action_no" type="object" icon="fa-times" class="text-danger" title="Non-Compliant" invisible="state == 'done'"/>
+                            <button name="action_na" type="object" icon="fa-minus" class="text-muted" title="N/A" invisible="state == 'done'"/>
+                        </list>
+                    </field>
+                    <field name="note" placeholder="Overall remarks (optional)"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cmp_audit_search" model="ir.ui.view">
+        <field name="name">rmg.cmp.audit.search</field>
+        <field name="model">rmg.cmp.audit</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="template_id"/>
+                <field name="user_id"/>
+                <filter name="todo" string="To Do" domain="[('state', '=', 'draft')]"/>
+                <filter name="done" string="Done" domain="[('state', '=', 'done')]"/>
+                <filter name="mine" string="Mine" domain="[('user_id', '=', uid)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_type" string="Audit Type" context="{'group_by': 'template_id'}"/>
+                    <filter name="g_date" string="Month" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_cmp_audit_graph" model="ir.ui.view">
+        <field name="name">rmg.cmp.audit.graph</field>
+        <field name="model">rmg.cmp.audit</field>
+        <field name="arch" type="xml">
+            <graph type="bar">
+                <field name="template_id"/>
+                <field name="score" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_cmp_audit" model="ir.actions.act_window">
+        <field name="name">Audits</field>
+        <field name="res_model">rmg.cmp.audit</field>
+        <field name="view_mode">list,form,graph</field>
+        <field name="context">{'search_default_todo': 1}</field>
+    </record>
+
+    <!-- Findings -->
+    <record id="view_cmp_finding_list" model="ir.ui.view">
+        <field name="name">rmg.cmp.finding.list</field>
+        <field name="model">rmg.cmp.finding</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="critical and state == 'open'" decoration-muted="state == 'closed'">
+                <field name="name"/>
+                <field name="section" optional="show"/>
+                <field name="critical"/>
+                <field name="user_id"/>
+                <field name="due_date"/>
+                <field name="correction_plan" optional="hide"/>
+                <field name="state" widget="badge" decoration-success="state == 'closed'" decoration-warning="state == 'open'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_cmp_finding_form" model="ir.ui.view">
+        <field name="name">rmg.cmp.finding.form</field>
+        <field name="model">rmg.cmp.finding</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_close" string="Close" type="object" class="btn-primary" invisible="state != 'open'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="section"/>
+                            <field name="critical"/>
+                        </group>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="due_date"/>
+                            <field name="closed_date" invisible="state != 'closed'"/>
+                            <field name="audit_id" invisible="not audit_id"/>
+                        </group>
+                    </group>
+                    <field name="correction_plan" placeholder="Mandatory correction plan" required="1"/>
+                    <field name="note" placeholder="Action taken (optional)"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cmp_finding_search" model="ir.ui.view">
+        <field name="name">rmg.cmp.finding.search</field>
+        <field name="model">rmg.cmp.finding</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="user_id"/>
+                <filter name="open" string="Open" domain="[('state', '=', 'open')]"/>
+                <filter name="closed" string="Closed" domain="[('state', '=', 'closed')]"/>
+                <filter name="critical" string="Critical" domain="[('critical', '=', True)]"/>
+                <filter name="overdue" string="Overdue" domain="[('state', '=', 'open'), ('due_date', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_user" string="Responsible" context="{'group_by': 'user_id'}"/>
+                    <filter name="g_audit" string="Audit" context="{'group_by': 'audit_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_cmp_finding" model="ir.actions.act_window">
+        <field name="name">Findings</field>
+        <field name="res_model">rmg.cmp.finding</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_open': 1}</field>
+    </record>
+
+    <!-- Licenses -->
+    <record id="view_cmp_license_list" model="ir.ui.view">
+        <field name="name">rmg.cmp.license.list</field>
+        <field name="model">rmg.cmp.license</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="state in ('expired', 'missing')" decoration-warning="state == 'expiring'">
+                <field name="type_id"/>
+                <field name="category" optional="show"/>
+                <field name="number"/>
+                <field name="expiry_date"/>
+                <field name="days_left" optional="show"/>
+                <field name="user_id" optional="show"/>
+                <field name="state" widget="badge" decoration-success="state == 'valid'" decoration-warning="state == 'expiring'" decoration-danger="state in ('expired', 'missing')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_cmp_license_form" model="ir.ui.view">
+        <field name="name">rmg.cmp.license.form</field>
+        <field name="model">rmg.cmp.license</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title"><h1><field name="type_id" options="{'no_create': True}"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="authority"/>
+                            <field name="number"/>
+                            <field name="issue_date"/>
+                            <field name="expiry_date"/>
+                        </group>
+                        <group>
+                            <field name="state" widget="badge" decoration-success="state == 'valid'" decoration-warning="state == 'expiring'" decoration-danger="state in ('expired', 'missing')"/>
+                            <field name="days_left" invisible="not expiry_date"/>
+                            <field name="user_id"/>
+                            <field name="attachment" filename="attachment_name"/>
+                            <field name="attachment_name" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="note" placeholder="Note (optional)"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cmp_license_calendar" model="ir.ui.view">
+        <field name="name">rmg.cmp.license.calendar</field>
+        <field name="model">rmg.cmp.license</field>
+        <field name="arch" type="xml">
+            <calendar string="Expiry Calendar" date_start="expiry_date" color="type_id" mode="month" quick_create="0" create="0">
+                <field name="type_id"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_cmp_license_search" model="ir.ui.view">
+        <field name="name">rmg.cmp.license.search</field>
+        <field name="model">rmg.cmp.license</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="type_id"/>
+                <field name="number"/>
+                <field name="user_id"/>
+                <filter name="missing" string="Missing" domain="[('state', '=', 'missing')]"/>
+                <filter name="expired" string="Expired" domain="[('state', '=', 'expired')]"/>
+                <filter name="expiring" string="Expiring Soon" domain="[('state', '=', 'expiring')]"/>
+                <filter name="valid" string="Valid" domain="[('state', '=', 'valid')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="g_cat" string="Category" context="{'group_by': 'category'}"/>
+                    <filter name="g_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_cmp_license" model="ir.actions.act_window">
+        <field name="name">Licenses</field>
+        <field name="res_model">rmg.cmp.license</field>
+        <field name="view_mode">list,form,calendar</field>
+    </record>
+
+    <!-- Configuration -->
+    <record id="view_cmp_ltype_list" model="ir.ui.view">
+        <field name="name">rmg.cmp.license.type.list</field>
+        <field name="model">rmg.cmp.license.type</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="name"/>
+                <field name="category"/>
+                <field name="authority"/>
+                <field name="validity_months"/>
+                <field name="alert_days"/>
+                <field name="mandatory"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_cmp_ltype" model="ir.actions.act_window">
+        <field name="name">License Types</field>
+        <field name="res_model">rmg.cmp.license.type</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <record id="view_cmp_template_list" model="ir.ui.view">
+        <field name="name">rmg.cmp.template.list</field>
+        <field name="model">rmg.cmp.template</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="standard"/>
+                <field name="result_type"/>
+                <field name="interval_months"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_cmp_template_form" model="ir.ui.view">
+        <field name="name">rmg.cmp.template.form</field>
+        <field name="model">rmg.cmp.template</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="standard"/>
+                            <field name="result_type"/>
+                        </group>
+                        <group>
+                            <field name="interval_months"/>
+                        </group>
+                    </group>
+                    <field name="item_ids" nolabel="1">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="section"/>
+                            <field name="name"/>
+                            <field name="critical"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cmp_template" model="ir.actions.act_window">
+        <field name="name">Audit Checklists</field>
+        <field name="res_model">rmg.cmp.template</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

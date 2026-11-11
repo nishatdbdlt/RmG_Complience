@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_cmp_root" name="Compliance" sequence="61"
+              web_icon="rmg_compliance,static/description/icon.png"
+              groups="group_cmp_user"/>
+    <menuitem id="menu_cmp_audit" name="Audits" parent="menu_cmp_root" action="action_cmp_audit" sequence="10"/>
+    <menuitem id="menu_cmp_finding" name="Findings" parent="menu_cmp_root" action="action_cmp_finding" sequence="20"/>
+    <menuitem id="menu_cmp_license" name="Licenses" parent="menu_cmp_root" action="action_cmp_license" sequence="30"/>
+    <menuitem id="menu_cmp_config" name="Configuration" parent="menu_cmp_root" sequence="90" groups="group_cmp_manager"/>
+    <menuitem id="menu_cmp_template" name="Audit Checklists" parent="menu_cmp_config" action="action_cmp_template" sequence="10"/>
+    <menuitem id="menu_cmp_ltype" name="License Types" parent="menu_cmp_config" action="action_cmp_ltype" sequence="20"/>
+</odoo>

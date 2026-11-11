@@ -1,0 +1,20 @@
+{
+    'name': 'RMG Compliance',
+    'version': '18.0.1.0.3',
+    'category': 'Operations',
+    'summary': 'Audit checklists, findings and license register for garment (RMG) factories',
+    'description': 'Pick audit type, tap All Compliant, mark only the problems. Licenses tracked with expiry alerts.',
+    'author': 'Custom',
+    'license': 'LGPL-3',
+    'depends': ['base', 'mail'],
+    'data': [
+        'security/security.xml',
+        'security/ir.model.access.csv',
+        'data/cmp_data.xml',
+        'data/cmp_content.xml',
+        'views/cmp_views.xml',
+        'views/cmp_menus.xml',
+    ],
+    'application': True,
+    'installable': True,
+}

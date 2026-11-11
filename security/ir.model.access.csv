@@ -1,0 +1,15 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+acc_ltype_user,license type user,model_rmg_cmp_license_type,group_cmp_user,1,0,0,0
+acc_ltype_mgr,license type manager,model_rmg_cmp_license_type,group_cmp_manager,1,1,1,1
+acc_tpl_user,template user,model_rmg_cmp_template,group_cmp_user,1,0,0,0
+acc_tpl_mgr,template manager,model_rmg_cmp_template,group_cmp_manager,1,1,1,1
+acc_item_user,template item user,model_rmg_cmp_template_item,group_cmp_user,1,0,0,0
+acc_item_mgr,template item manager,model_rmg_cmp_template_item,group_cmp_manager,1,1,1,1
+acc_lic_user,license user,model_rmg_cmp_license,group_cmp_user,1,1,1,0
+acc_lic_mgr,license manager,model_rmg_cmp_license,group_cmp_manager,1,1,1,1
+acc_audit_user,audit user,model_rmg_cmp_audit,group_cmp_user,1,1,1,0
+acc_audit_mgr,audit manager,model_rmg_cmp_audit,group_cmp_manager,1,1,1,1
+acc_aline_user,audit line user,model_rmg_cmp_audit_line,group_cmp_user,1,1,1,0
+acc_aline_mgr,audit line manager,model_rmg_cmp_audit_line,group_cmp_manager,1,1,1,1
+acc_find_user,finding user,model_rmg_cmp_finding,group_cmp_user,1,1,1,0
+acc_find_mgr,finding manager,model_rmg_cmp_finding,group_cmp_manager,1,1,1,1
